@@ -180,10 +180,21 @@ def test_for_subject(subject_to_leave_out, data_dir, seq_length=100, step=5, sin
     
     model = AdvancedLSTMModel(INPUT_SIZE, HIDDEN_SIZE, NUM_LAYERS, OUTPUT_SIZE, DROPOUT_PROB).to(device)
     try:
-        model.load_state_dict(torch.load(model_path, map_location=device))
+        state_dict = torch.load(model_path, map_location=device)
+        # Strip 'module.' prefix if present (for DataParallel compatibility)
+        new_state_dict = {}
+        for k, v in state_dict.items():
+            name = k
+            if k.startswith('module.'):
+                name = k[7:]  # remove 'module.'
+            new_state_dict[name] = v
+        model.load_state_dict(new_state_dict)
         print(f"\nSuccessfully loaded model from: {model_path}")
     except FileNotFoundError:
         print(f"\nError: Model {model_path} not found.")
+        return None
+    except RuntimeError as e:
+        print(f"\nError loading model state dict: {e}")
         return None
 
     # GPU Warm-up
@@ -308,33 +319,6 @@ def test_for_subject(subject_to_leave_out, data_dir, seq_length=100, step=5, sin
             plt.tight_layout()
             plt.savefig(os.path.join(plot_dir, f'trial_{trial_idx+1}_pred.png'), dpi=150, bbox_inches='tight')
             plt.close('all')
-
-            # Plot predictions vs ground truth
-            plt.figure(figsize=(15, 10))
-            time_steps = np.arange(len(predictions_rescaled))
-            
-            # Plot LY Moment
-            plt.subplot(2, 1, 1)
-            plt.plot(time_steps, ground_truth_rescaled[:, 0], label='Actual LY Moment', color='blue', alpha=0.8)
-            plt.plot(time_steps, predictions_rescaled[:, 0], label='Predicted LY Moment', color='red', linestyle='--')
-            plt.title(f'Trial {trial_idx + 1}: LY KAM Prediction (Subject {subject_to_leave_out})')
-            plt.ylabel('KAM (Nm/Kg)')
-            plt.legend()
-            plt.grid(True)
-
-            # Plot RY Moment
-            plt.subplot(2, 1, 2)
-            plt.plot(time_steps, ground_truth_rescaled[:, 1], label='Actual RY Moment', color='green', alpha=0.8)
-            plt.plot(time_steps, predictions_rescaled[:, 1], label='Predicted RY Moment', color='orange', linestyle='--')
-            plt.title(f'Trial {trial_idx + 1}: RY KAM Prediction (Subject {subject_to_leave_out})')
-            plt.xlabel('Time Step')
-            plt.ylabel('KAM (Nm/Kg)')
-            plt.legend()
-            plt.grid(True)
-
-            plt.tight_layout()
-            plt.savefig(os.path.join(plot_dir, f'trial_{trial_idx+1}_pred.png'), dpi=150, bbox_inches='tight')
-            plt.close('all')
             gc.collect()
 
     # Save metrics
@@ -379,7 +363,7 @@ def test_for_subject(subject_to_leave_out, data_dir, seq_length=100, step=5, sin
 def main():
     parser = argparse.ArgumentParser(description='LSTM-based Knee Moment Prediction Testing Script')
     parser.add_argument('--start_subject', type=int, default=1, help='Starting subject ID for batch processing')
-    parser.add_argument('--end_subject', type=int, default=1, help='Ending subject ID for batch processing')
+    parser.add_argument('--end_subject', type=int, default=10, help='Ending subject ID for batch processing')
     parser.add_argument('--single_subject', type=int, help='Test only one specific subject')
     parser.add_argument('--data_dir', type=str, default='data', help='Directory containing subject data')
     parser.add_argument('--seq_length', type=int, default=100, help='Sequence length for LSTM input')
