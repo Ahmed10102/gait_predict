@@ -1,14 +1,6 @@
 # Knee Moment Prediction with Bidirectional LSTM  
 ### **Leave-One-Subject-Out (LOSO) Cross-Validation Pipeline**  
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)  
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-orange)](https://pytorch.org/)  
-[![ONNX](https://img.shields.io/badge/ONNX-Export-green)](https://onnxruntime.ai/)  
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
----
-
-## 📌 **Overview**
 
 This repository implements a **deep learning pipeline** to predict **bilateral knee adduction moments (KAM)** from **6-axis accelerometer data** collected from the lower limbs using a **Bidirectional LSTM** model. The system uses **Leave-One-Subject-Out (LOSO)** cross-validation to ensure **generalization across individuals**, a critical requirement in biomechanical and wearable sensor applications.
 
