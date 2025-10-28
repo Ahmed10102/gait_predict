@@ -143,7 +143,7 @@ def load_test_data_frames(subject_to_leave_out, data_dir):
 def test_for_subject(subject_to_leave_out, data_dir, seq_length=100, step=5, single_trial=False):
     INPUT_SIZE, HIDDEN_SIZE, NUM_LAYERS, OUTPUT_SIZE, DROPOUT_PROB = 6, 64, 2, 2, 0.3
     model_path = f'model_without_subj_{subject_to_leave_out}.pth'
-
+    model_path = "models/"+model_path
     # Create output folders
     pred_dir = f'predictions/subj_{subject_to_leave_out}'
     plot_dir = f'plots/subj_{subject_to_leave_out}'
