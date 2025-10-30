@@ -65,7 +65,7 @@ pip install -r requirements.txt
 
 > **requirements.txt**
 ```txt
-torch>=2.0.0
+torch
 torchvision
 numpy
 pandas
